@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <!-- Integration des outils firebase -->
+    <script src="https://www.gstatic.com/firebasejs/7.21.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.21.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.21.0/firebase-database.js"></script>
+    <script src="config/config.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.73/Tone.js"></script>
+
+    <script src="js/Polygon.js"></script>
+    <script src="js/Sequence.js"></script>
+    <script src="js/Synth.js"></script>
+    <script src="js/App.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body,
+      html {
+        margin: 0px;
+        padding: 0px;
+      }
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="divRot">
+      <p id="uiRot"></p>
+      <p id="uiLevel"></p>
+    </div>
+    <div class="divPlayer2">
+      <p id="playerName">Player 2</p>
+    </div>
+    <div class="divPlayer1">
+      <img src="svg/arrow1.svg" id="arrowLeft" />
+      <img src="svg/arrow2.svg" id="arrowRight" />
+    </div>
+    <div class="divForms">
+      <div id="octo">
+        <p class="numForms"></p>
+      </div>
+      <div id="square">
+        <p class="numForms"></p>
+      </div>
+      <div id="triangle">
+        <p class="numForms"></p>
+      </div>
+      <div id="line">
+        <p class="numForms" style="margin-left: 75%"></p>
+      </div>
+    </div>
+  </body>
+</html>
