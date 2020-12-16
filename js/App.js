@@ -11,6 +11,13 @@ const lvl = {
   },
 };
 
+let MAINBASE = 'PUZZLELORIS';
+
+const FIREBASE_DATA = {
+  lvl,
+  drawnShapes: [],
+};
+
 let polygoneTableP1 = [];
 let polygoneTableP2 = [];
 
@@ -82,10 +89,21 @@ function setup() {
 
   // const urlParameter = new URLSearchParams(window.location.search);
   // ID = urlParameter.get("nom");
-  // DATABASE.ref("PUZZLELORIS/DATA").on("value", (snapshot) => {
+  // DATABASE.ref(MAINBASE + "/DATA/").once("value", (snapshot) => {
   //   const allData = snapshot.val();
   //   console.log(allData);
   // });
+
+  DATABASE.ref(MAINBASE + "/DATA/lvl").on("value", (snapshot) => {
+    const allData = snapshot.val();
+    console.log(allData);
+  });
+
+
+  DATABASE.ref(MAINBASE + "/DATA/drawnShapes").on("value", (snapshot) => {
+    const allData = snapshot.val();
+    console.log(allData);
+  });
 }
 
 // function song(time) {
@@ -100,11 +118,11 @@ function draw() {
   let rc = 12.5;
   t.update();
 
-  const data = {
-    globalAngle: t.smoothAngle,
-    drawnPolys: polygoneTableP1,
-    isPlayerDone: lvl.finished,
-  };
+  // const data = {
+  //   globalAngle: t.smoothAngle,
+  //   drawnPolys: polygoneTableP1,
+  //   lvl,
+  // };
 
   // SEND_MESSAGE("PUZZLELORIS/DATA/" + data);
 
@@ -182,6 +200,13 @@ function arrowEvents() {
 }
 
 function drawPolys() {
+  let shapes = {
+    octo: 8,
+    square: 4,
+    triangle: 3,
+    line: 2,
+  };
+
   let octoSelect = document.getElementById("octo");
   octoSelect.addEventListener("mouseup", (e) => {
     addShapeToSeq(lvl.shapes.octo, 8, blue[0]);
@@ -217,6 +242,10 @@ function addShapeToSeq(numOfShapesId, nPoints, col) {
     polygoneTableP1.push(
       new Polygon(0, 0, r, nPoints, col, lvl.steps, t.angle, 1)
     );
+
+    FIREBASE_DATA.drawnShapes.push({points: nPoints, color:  col, angle: t.angle});
+    updateFireBase();
+
     // polygoneTableP2.push(
     //   new Polygon(0, 0, r, nPoints, col, lvl.steps, t.angle, 3)
     // );
@@ -227,6 +256,10 @@ function addShapeToSeq(numOfShapesId, nPoints, col) {
       seq0 -= 1;
     }
   }
+}
+
+function updateFireBase() {
+  SEND_MESSAGE(MAINBASE + "/DATA/", FIREBASE_DATA);
 }
 
 function sideUi(id, col1, col2, numOfShapes, nPoints) {

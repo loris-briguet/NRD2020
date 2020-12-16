@@ -1,5 +1,6 @@
 class Polygon {
   constructor(x, y, radius, nPoints, color, div, rot, mult) {
+
     this.x = x;
     this.y = y;
     this.r = radius;
