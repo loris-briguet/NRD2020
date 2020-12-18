@@ -1,13 +1,14 @@
 // Initialize Firebase
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBCboafcPQ_3ZRI1Sf_00MSpl_SURHWnOI",
-  authDomain: "jeudiecal.firebaseapp.com",
-  databaseURL: "https://jeudiecal.firebaseio.com",
-  projectId: "jeudiecal",
-  storageBucket: "jeudiecal.appspot.com",
-  messagingSenderId: "867653886807",
-  appId: "1:867653886807:web:5652a4cbdda0fe1de75412",
+  apiKey: "AIzaSyD3uacXbXuYPTBSOWTtgOyodjsUhTcX03o",
+  authDomain: "euclideanpuzzle.firebaseapp.com",
+  databaseURL: "https://euclideanpuzzle-default-rtdb.firebaseio.com",
+  projectId: "euclideanpuzzle",
+  storageBucket: "euclideanpuzzle.appspot.com",
+  messagingSenderId: "557054114182",
+  appId: "1:557054114182:web:e03f1797cbc5a035a8d407",
+  measurementId: "G-J4F4YF7Y54",
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);

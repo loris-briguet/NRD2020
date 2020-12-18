@@ -1,7 +1,7 @@
 const lvl = {
   num: 1,
   steps: 8,
-  rot: 5,
+  rot: 1,
   finished: false,
   shapes: {
     octo: 1,
@@ -9,13 +9,6 @@ const lvl = {
     tri: 1,
     line: 2,
   },
-};
-
-let MAINBASE = 'PUZZLELORIS';
-
-const FIREBASE_DATA = {
-  lvl,
-  drawnShapes: [],
 };
 
 let polygoneTableP1 = [];
@@ -66,6 +59,14 @@ let t = {
   },
 };
 
+let MAINBASE = "PUZZLELORIS";
+
+const FIREBASE_DATA = {
+  lvl,
+  drawnShapes: [],
+  globalAngle: 0,
+};
+
 function preload() {
   myFont = loadFont("./font/Akkurat.woff");
 }
@@ -78,7 +79,6 @@ function setup() {
   t.init(lvl.rot, lvl.rot, 0, 360);
   arrowEvents();
   drawPolys();
-
   // bassSynth = new Tone.MembraneSynth().toMaster();
 
   // loopBeat = new Tone.Loop(song, "4n");
@@ -89,16 +89,11 @@ function setup() {
 
   // const urlParameter = new URLSearchParams(window.location.search);
   // ID = urlParameter.get("nom");
-  // DATABASE.ref(MAINBASE + "/DATA/").once("value", (snapshot) => {
-  //   const allData = snapshot.val();
-  //   console.log(allData);
-  // });
 
-  DATABASE.ref(MAINBASE + "/DATA/lvl").on("value", (snapshot) => {
+  DATABASE.ref(MAINBASE + "/DATA/").on("value", (snapshot) => {
     const allData = snapshot.val();
     console.log(allData);
   });
-
 
   DATABASE.ref(MAINBASE + "/DATA/drawnShapes").on("value", (snapshot) => {
     const allData = snapshot.val();
@@ -111,20 +106,10 @@ function setup() {
 // }
 
 function draw() {
-  let beat = Tone.Transport.PPQ;
-
   background("#111111");
   r = width / 4;
   let rc = 12.5;
   t.update();
-
-  // const data = {
-  //   globalAngle: t.smoothAngle,
-  //   drawnPolys: polygoneTableP1,
-  //   lvl,
-  // };
-
-  // SEND_MESSAGE("PUZZLELORIS/DATA/" + data);
 
   //////////// UI ////////////////
   /////visu player 2
@@ -141,10 +126,14 @@ function draw() {
   pop();
 
   /////side polys
-  sideUi("octo", blue[0], blue[1], lvl.shapes.octo, 8);
-  sideUi("square", yellow[0], yellow[1], lvl.shapes.square, 4);
-  sideUi("triangle", orange[0], orange[1], lvl.shapes.tri, 3);
-  sideUi("line", red[0], red[1], lvl.shapes.line, 2);
+  let sideOcto = new SideUi("octo", blue[0], blue[1], lvl.shapes.octo, 8);
+  sideOcto.show();
+  let sideSq = new SideUi("square", yellow[0], yellow[1], lvl.shapes.square, 4);
+  sideSq.show();
+  let sideTri = new SideUi("triangle", orange[0], orange[1], lvl.shapes.tri, 3);
+  sideTri.show();
+  let sideLine = new SideUi("line", red[0], red[1], lvl.shapes.line, 2);
+  sideLine.show();
 
   //////////// SEQUENCER ////////////////
   push();
@@ -154,6 +143,10 @@ function draw() {
   sequenceP1.show();
   for (let i = 0; i < polygoneTableP1.length; i++) {
     polygoneTableP1[i].show();
+  }
+  if (lvl.rot <= 0) {
+    arrowLeft.style = "opacity: 40%; cursor: default !important";
+    arrowRight.style = "opacity: 40%; cursor: default !important";
   }
   pop();
 }
@@ -169,16 +162,14 @@ function arrowEvents() {
       t.turn(-1);
       lvl.rot -= 1;
       uiRot.textContent = "Rotations: " + lvl.rot;
-      if (seq0 >= 7) {
+      if (seq0 >= lvl.steps - 1) {
         seq0 = 0;
       } else {
         seq0 += 1;
       }
     }
-    if (lvl.rot <= 0) {
-      arrowLeft.style = "opacity: 40%; cursor: default !important";
-      arrowRight.style = "opacity: 40%; cursor: default !important";
-    }
+    FIREBASE_DATA.globalAngle = t.smoothAngle;
+    updateFireBase();
   });
 
   arrowRight.addEventListener("mouseup", (e) => {
@@ -187,26 +178,17 @@ function arrowEvents() {
       t.turn(1);
       uiRot.textContent = "Rotations: " + lvl.rot;
       if (seq0 <= 0) {
-        seq0 = 7;
+        seq0 = lvl.steps - 1;
       } else {
         seq0 -= 1;
       }
     }
-    if (lvl.rot <= 0) {
-      arrowLeft.style = "opacity: 40%; cursor: default !important";
-      arrowRight.style = "opacity: 40%; cursor: default !important";
-    }
+    FIREBASE_DATA.globalAngle = t.smoothAngle;
+    updateFireBase();
   });
 }
 
 function drawPolys() {
-  let shapes = {
-    octo: 8,
-    square: 4,
-    triangle: 3,
-    line: 2,
-  };
-
   let octoSelect = document.getElementById("octo");
   octoSelect.addEventListener("mouseup", (e) => {
     addShapeToSeq(lvl.shapes.octo, 8, blue[0]);
@@ -237,18 +219,25 @@ function drawPolys() {
   });
 }
 
+function shapeCounter(nShapes) {
+  if (nShapes > 0) {
+    nShapes -= 1;
+  }
+}
+
 function addShapeToSeq(numOfShapesId, nPoints, col) {
   if (numOfShapesId > 0) {
     polygoneTableP1.push(
       new Polygon(0, 0, r, nPoints, col, lvl.steps, t.angle, 1)
     );
 
-    FIREBASE_DATA.drawnShapes.push({points: nPoints, color:  col, angle: t.angle});
+    FIREBASE_DATA.drawnShapes.push({
+      points: nPoints,
+      color: col,
+      angle: t.angle,
+    });
     updateFireBase();
 
-    // polygoneTableP2.push(
-    //   new Polygon(0, 0, r, nPoints, col, lvl.steps, t.angle, 3)
-    // );
     t.turn(1);
     if (seq0 <= 0) {
       seq0 = 7;
@@ -260,38 +249,6 @@ function addShapeToSeq(numOfShapesId, nPoints, col) {
 
 function updateFireBase() {
   SEND_MESSAGE(MAINBASE + "/DATA/", FIREBASE_DATA);
-}
-
-function sideUi(id, col1, col2, numOfShapes, nPoints) {
-  let divX =
-    document.getElementById(id).getBoundingClientRect().left +
-    document.getElementById(id).offsetWidth / 2;
-  let divY =
-    document.getElementById(id).getBoundingClientRect().top +
-    document.getElementById(id).offsetHeight / 2;
-  let divT = document.getElementById(id).firstElementChild;
-  let divCol;
-
-  if (numOfShapes > 0) {
-    divCol = col1;
-  } else {
-    divCol = col2;
-  }
-
-  let sidePoly = new Polygon(
-    divX,
-    divY,
-    r / 4.5,
-    nPoints,
-    divCol,
-    lvl.steps,
-    0,
-    1
-  );
-
-  sidePoly.show();
-  divT.textContent = numOfShapes + "x";
-  divT.style.color = divCol;
 }
 
 function windowResized() {
