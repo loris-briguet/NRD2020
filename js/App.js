@@ -2,7 +2,7 @@ const lvl = {
   num: 1,
   steps: 8,
   rot: 1,
-  finished: false,
+  finished: true,
   shapes: {
     octo: 1,
     square: 1,
@@ -22,12 +22,13 @@ let yellow = ["rgba(235,180,0,1)", "rgba(235,180,0,0.4)"];
 
 let myFont;
 let seq0 = 0;
-var r;
+let r;
 let ID;
 
 let loopBeat;
 let bassSynth;
 let masterClock;
+let step = 0;
 
 let t = {
   angle: 0,
@@ -79,13 +80,11 @@ function setup() {
   t.init(lvl.rot, lvl.rot, 0, 360);
   arrowEvents();
   drawPolys();
-  // bassSynth = new Tone.MembraneSynth().toMaster();
-
-  // loopBeat = new Tone.Loop(song, "4n");
-
-  // Tone.Transport.bpm.value = "125";
-  // Tone.Transport.start();
-  // loopBeat.start(0);
+  bassSynth = new Tone.MembraneSynth().toMaster();
+  loopBeat = new Tone.Loop(song, "4n");
+  Tone.Transport.bpm.value = "145";
+  Tone.Transport.start();
+  loopBeat.start(0);
 
   // const urlParameter = new URLSearchParams(window.location.search);
   // ID = urlParameter.get("nom");
@@ -101,9 +100,10 @@ function setup() {
   });
 }
 
-// function song(time) {
-//   bassSynth.triggerAttackRelease("C2", "8n", time);
-// }
+function song(time) {
+  // bassSynth.triggerAttackRelease("C2", "8n", time);
+  step += 1;
+}
 
 function draw() {
   background("#111111");
@@ -119,7 +119,7 @@ function draw() {
   tint(255, 126);
   rotate(-t.smoothAngle);
   let sequenceP2 = new Sequence(0, 0, lvl, r, beige[0], rc, 4, seq0);
-  sequenceP2.show();
+  sequenceP2.show(step);
   for (let i = 0; i < polygoneTableP2.length; i++) {
     polygoneTableP2[i].show();
   }
@@ -127,20 +127,20 @@ function draw() {
 
   /////side polys
   let sideOcto = new SideUi("octo", blue[0], blue[1], lvl.shapes.octo, 8);
-  sideOcto.show();
+  sideOcto.show(lvl.shapes.octo);
   let sideSq = new SideUi("square", yellow[0], yellow[1], lvl.shapes.square, 4);
-  sideSq.show();
+  sideSq.show(lvl.shapes.square);
   let sideTri = new SideUi("triangle", orange[0], orange[1], lvl.shapes.tri, 3);
-  sideTri.show();
+  sideTri.show(lvl.shapes.tri);
   let sideLine = new SideUi("line", red[0], red[1], lvl.shapes.line, 2);
-  sideLine.show();
+  sideLine.show(lvl.shapes.line);
 
   //////////// SEQUENCER ////////////////
   push();
   translate(width / 2, height / 2);
   rotate(t.smoothAngle);
   let sequenceP1 = new Sequence(0, 0, lvl, r, beige[0], rc, 2, seq0);
-  sequenceP1.show();
+  sequenceP1.show(step);
   for (let i = 0; i < polygoneTableP1.length; i++) {
     polygoneTableP1[i].show();
   }
@@ -189,42 +189,20 @@ function arrowEvents() {
 }
 
 function drawPolys() {
-  let octoSelect = document.getElementById("octo");
+  setupPoly("octo", lvl.shapes.octo, 8, blue[0]);
+  setupPoly("square", lvl.shapes.square, 4, yellow[0]);
+  setupPoly("triangle", lvl.shapes.tri, 3, orange[0]);
+  setupPoly("line", lvl.shapes.line, 2, red[0]);
+}
+function setupPoly(id, shapes, npoints, col) {
+  let octoSelect = document.getElementById(id);
   octoSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.octo, 8, blue[0]);
-    if (lvl.shapes.octo > 0) {
-      lvl.shapes.octo -= 1;
-    }
-  });
-  let squareSelect = document.getElementById("square");
-  squareSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.square, 4, yellow[0]);
-    if (lvl.shapes.square > 0) {
-      lvl.shapes.square -= 1;
-    }
-  });
-  let triangleSelect = document.getElementById("triangle");
-  triangleSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.tri, 3, orange[0]);
-    if (lvl.shapes.tri > 0) {
-      lvl.shapes.tri -= 1;
-    }
-  });
-  let lineSelect = document.getElementById("line");
-  lineSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.line, 2, red[0]);
-    if (lvl.shapes.line > 0) {
-      lvl.shapes.line -= 1;
+    addShapeToSeq(shapes, npoints, col);
+    if (shapes > 0) {
+      shapes -= 1;
     }
   });
 }
-
-function shapeCounter(nShapes) {
-  if (nShapes > 0) {
-    nShapes -= 1;
-  }
-}
-
 function addShapeToSeq(numOfShapesId, nPoints, col) {
   if (numOfShapesId > 0) {
     polygoneTableP1.push(
@@ -240,7 +218,7 @@ function addShapeToSeq(numOfShapesId, nPoints, col) {
 
     t.turn(1);
     if (seq0 <= 0) {
-      seq0 = 7;
+      seq0 = lvl.steps - 1;
     } else {
       seq0 -= 1;
     }

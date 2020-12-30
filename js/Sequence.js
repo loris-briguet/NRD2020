@@ -1,5 +1,5 @@
 class Sequence {
-  constructor(x, y, level, size, color, rc, mult, seq0, time) {
+  constructor(x, y, level, size, color, rc, mult, seq0) {
     this.x = x;
     this.y = y;
     this.div = level.steps;
@@ -12,7 +12,7 @@ class Sequence {
     this.angle = 360 / this.div;
   }
 
-  show(time) {
+  show(step = 1) {
     noFill();
     stroke("#0f0f0f");
     strokeWeight((this.rc / 4) * this.mult);
@@ -22,7 +22,7 @@ class Sequence {
       let yCircle = this.y + sin(this.angle * i) * this.size;
       let xCircle = this.x - cos(this.angle * i) * this.size;
       if (this.done == true) {
-        if (Math.floor(millis() / 500) % this.div == i) {
+        if (step % this.div == i) {
           strokeWeight((this.rc / 4) * this.mult);
           stroke(this.color);
           noFill();
