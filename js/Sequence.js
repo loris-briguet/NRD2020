@@ -12,7 +12,7 @@ class Sequence {
     this.angle = 360 / this.div;
   }
 
-  show(step = 1) {
+  show() {
     noFill();
     stroke("#0f0f0f");
     strokeWeight((this.rc / 4) * this.mult);
@@ -22,7 +22,7 @@ class Sequence {
       let yCircle = this.y + sin(this.angle * i) * this.size;
       let xCircle = this.x - cos(this.angle * i) * this.size;
       if (this.done == true) {
-        if (step % this.div == i) {
+        if (1 % this.div == i) {
           strokeWeight((this.rc / 4) * this.mult);
           stroke(this.color);
           noFill();

@@ -19,7 +19,7 @@ firebase.initializeApp(firebaseConfig);
 firebase.auth().onAuthStateChanged((user) => {
   console.log("onAuthStateChanged");
   if (user) {
-    console.log(user);
+    // console.log(user);
     // User is signed in.
     let isAnonymous = user.isAnonymous;
     let uid = user.uid;

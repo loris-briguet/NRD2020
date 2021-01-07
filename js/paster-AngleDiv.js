@@ -7,8 +7,8 @@ let lvl = {
   p2Finished: false,
   shapes: {
     octo: 1,
-    square: 4,
-    tri: 1,
+    square: 1,
+    tri: 0,
     line: 1,
   },
 };
@@ -21,6 +21,8 @@ let polygoneTableP1 = [];
 let polygoneTableP2 = [];
 
 let globAngle = 0;
+let anglediv = 1;
+let shapeAngle = 0;
 
 let beige = ["rgba(240,235,210,1)", "rgba(240,235,210,0.4)"];
 let blue = ["rgba(0,65,115,1)", "rgba(0,65,115,0.4)"];
@@ -114,6 +116,8 @@ function song(time) {
 }
 
 function draw() {
+  console.log(anglediv);
+  console.log(globAngle);
   background("#111111");
   r = width / 4;
   t.smoothAngle = lerp(t.smoothAngle, globAngle, 0.1);
@@ -139,7 +143,8 @@ function draw() {
         lvl.steps,
         pt2[i].rot,
         4,
-        false
+        false,
+        shapeAngle
       ).show();
       // console.log(
       //   "angle:" + t.angle + ", globAngle:" + globAngle + "pt2a:" + pt2[i].rot
@@ -180,35 +185,6 @@ function draw() {
   sequenceP1.show();
   for (let i = 0; i < polygoneTableP1.length; i++) {
     polygoneTableP1[i].show();
-
-    //player == "p1"
-    //polygoneTableP1[a].np == 4 &&
-    //globAngle - polygoneTableP1[a].rot  == 585
-    //polygoneTableP1[b].np == 3 &&
-    //globAngle - polygoneTableP1[b].rot  == 315
-    //polygoneTableP1[c].np == 2 &&
-    //globAngle - polygoneTableP1[c].rot == 270
-    //polygoneTableP1[d].np == 8
-
-    //player == "p2"
-    //polygoneTableP1[a].np == 4 &&
-    //globAngle - polygoneTableP1[a].rot  == 540
-    //polygoneTableP1[b].np == 3 &&
-    //globAngle - polygoneTableP1[b].rot == 450
-    //polygoneTableP1[c].np == 2 &&
-    //globAngle - polygoneTableP1[c].rot == 585
-    //polygoneTableP1[d].np == 8
-
-    if (
-      player == "p1" &&
-      polygoneTableP1[i].np == 4 &&
-      polygoneTableP1[i].rot % 90 == 0
-    ) {
-      console.log("wow thats right");
-      //lvl.p1Finished == true;
-    } else if (player == "p2" && 0 == 1) {
-      lvl.p2Finished == true;
-    }
   }
   if (lvl.rot <= 0) {
     arrowLeft.style = "opacity: 40%; cursor: default !important";
@@ -217,6 +193,11 @@ function draw() {
   pop();
 
   //Check if level is done
+  if (player == "p1" && 0 == 1) {
+    lvl.p1Finished == true;
+  } else if (player == "p2" && 0 == 1) {
+    lvl.p2Finished == true;
+  }
   if (lvl.p1Finished == true && lvl.p2Finished) {
     lvl.finished = true;
   }
@@ -232,6 +213,7 @@ function arrowEvents() {
     if (lvl.rot > 0) {
       stepRotate(lvl.steps, -1);
       lvl.rot -= 1;
+      anglediv -= 1;
       uiRot.textContent = "Rotations: " + lvl.rot;
       if (seq0 >= lvl.steps - 1) {
         seq0 = 0;
@@ -246,6 +228,7 @@ function arrowEvents() {
     if (lvl.rot > 0) {
       stepRotate(lvl.steps, 1);
       lvl.rot -= 1;
+      anglediv += 1;
       uiRot.textContent = "Rotations: " + lvl.rot;
       if (seq0 <= 0) {
         seq0 = lvl.steps - 1;
@@ -296,8 +279,21 @@ function shapeCounter(nShapes) {
 
 function addShapeToSeq(numOfShapesId, nPoints, col) {
   if (numOfShapesId > 0) {
+    anglediv += 1;
+    shapeAngle = globAngle / anglediv;
     polygoneTableP1.push(
-      new Polygon(0, 0, r, nPoints, col, lvl.steps, -globAngle, 1)
+      new Polygon(
+        0,
+        0,
+        r,
+        nPoints,
+        col,
+        lvl.steps,
+        t.angle,
+        1,
+        true,
+        shapeAngle
+      )
     );
 
     if (player == "p1") {

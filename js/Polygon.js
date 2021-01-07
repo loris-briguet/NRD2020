@@ -1,30 +1,33 @@
 class Polygon {
-  constructor(x, y, radius, nPoints, color, div, rot, mult) {
-
+  constructor(x, y, radius, nPoints, color, div, rot, mult, bool) {
     this.x = x;
     this.y = y;
     this.r = radius;
     this.np = nPoints;
     this.c = color;
     this.d = div;
-    this.rot = -rot;
-    if (this.np == 2) {
-      this.rot = this.rot - 90;
-    } else if (this.np == 3) {
-      this.rot = this.rot + 135;
-    } else if (this.np == 4) {
-      this.rot = this.rot + 45;
-    }
+    this.rot = rot;
     this.mult = mult;
+
+    if (bool != false) {
+      if (this.np == 2) {
+        this.rot += 90;
+      } else if (this.np == 3) {
+        this.rot += 135;
+      } else if (this.np == 4) {
+        this.rot -= 45;
+      }
+    } else {
+    }
   }
 
   show() {
-    this.triOffset = 0;
+    let triOffset = 0;
     if (this.np == 3 && this.d == 32) {
-      this.triOffset = 360 / this.d;
+      triOffset = 360 / this.d;
     }
 
-    this.angle = (360 / this.d) * Math.ceil(this.d / this.np) + this.triOffset;
+    let angle = (360 / this.d) * Math.ceil(this.d / this.np) + triOffset;
 
     push();
 
@@ -39,10 +42,10 @@ class Polygon {
 
     stroke(this.c);
 
-    for (this.a = 0; this.a < 360; this.a += this.angle) {
-      this.sx = 0 + cos(this.a) * this.r;
-      this.sy = 0 + sin(this.a) * this.r;
-      vertex(this.sx, this.sy);
+    for (let a = 0; a < 360; a += angle) {
+      let sx = 0 + cos(a) * this.r;
+      let sy = 0 + sin(a) * this.r;
+      vertex(sx, sy);
     }
 
     endShape(CLOSE);

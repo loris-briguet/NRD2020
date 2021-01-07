@@ -8,7 +8,7 @@ class SideUi {
     this.divCol;
   }
 
-  show(numOfShapes) {
+  show() {
     let divX =
       document.getElementById(this.id).getBoundingClientRect().left +
       document.getElementById(this.id).offsetWidth / 2;
@@ -17,7 +17,7 @@ class SideUi {
       document.getElementById(this.id).offsetHeight / 2;
     let divT = document.getElementById(this.id).firstElementChild;
 
-    if (numOfShapes > 0) {
+    if (this.nShapes > 0) {
       this.divCol = this.col1;
     } else {
       this.divCol = this.col2;
@@ -35,7 +35,7 @@ class SideUi {
     );
 
     sidePoly.show();
-    divT.textContent = numOfShapes + "x";
+    divT.textContent = this.nShapes + "x";
     divT.style.color = this.divCol;
   }
 }
