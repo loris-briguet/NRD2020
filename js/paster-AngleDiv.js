@@ -157,21 +157,9 @@ function draw() {
   if (lvl.finished == false) {
     let sideOcto = new SideUi("octo", blue[0], blue[1], lvl.shapes.octo, 8);
     sideOcto.show();
-    let sideSq = new SideUi(
-      "square",
-      yellow[0],
-      yellow[1],
-      lvl.shapes.square,
-      4
-    );
+    let sideSq = new SideUi("square", yel[0], yel[1], lvl.shapes.square, 4);
     sideSq.show();
-    let sideTri = new SideUi(
-      "triangle",
-      orange[0],
-      orange[1],
-      lvl.shapes.tri,
-      3
-    );
+    let sideTri = new SideUi("triangle", orn[0], orn[1], lvl.shapes.tri, 3);
     sideTri.show();
     let sideLine = new SideUi("line", red[0], red[1], lvl.shapes.line, 2);
     sideLine.show();
@@ -250,14 +238,14 @@ function drawPolys() {
   });
   let squareSelect = document.getElementById("square");
   squareSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.square, 4, yellow[0]);
+    addShapeToSeq(lvl.shapes.square, 4, yel[0]);
     if (lvl.shapes.square > 0) {
       lvl.shapes.square -= 1;
     }
   });
   let triangleSelect = document.getElementById("triangle");
   triangleSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.tri, 3, orange[0]);
+    addShapeToSeq(lvl.shapes.tri, 3, orn[0]);
     if (lvl.shapes.tri > 0) {
       lvl.shapes.tri -= 1;
     }
@@ -317,3 +305,7 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 //390
+
+if (player == "p1") {
+} else if (player == "p2") {
+}
