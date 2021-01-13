@@ -39,7 +39,7 @@ let yel = ["rgba(235,180,0,1)", "rgba(235,180,0,0.4)"];
 let myFont;
 let seq0 = 0;
 let north;
-var r;
+var RADIUS;
 let rc = 12.5;
 
 let loopBeat;
@@ -54,8 +54,33 @@ let t = {
   smoothAngle: 0,
 };
 
-let v = [717, 364, 543, 435, 542, 607, 717, 783, 889, 783, 964, 611];
-//let v = [];
+let SHAPE_POINTS = readPath(
+  "64.7,64.6 56.1,85.4 35.4,85.4 14.7,64.7 14.7,43.9 35.5,35.3 	"
+);
+
+function readPath(pathStr) {
+  let res = pathStr
+    .split(" ")
+    .filter((txt) => txt.length > 1)
+    .map((coords) => {
+      let [x, y] = coords.split(",");
+
+      x = x / 100 - 0.5;
+      y = y / 100 - 0.5;
+
+      return { x, y };
+    });
+  console.log("generated path: ", res);
+  return res;
+}
+
+// let [
+// {x: 717, y: 364},
+// {x: 543, y: 435},
+// {x: 717, y: 364},
+
+// ]
+// //let v = [];
 
 function preload() {
   myFont = loadFont("./font/Akkurat.woff");
@@ -136,7 +161,7 @@ function song(time) {
 
 function draw() {
   background("#111111");
-  r = width / 4;
+  RADIUS = width / 4;
   t.smoothAngle = lerp(t.smoothAngle, globAngle, 0.1);
   //////////// UI ////////////////
   /////side polys
@@ -158,20 +183,12 @@ function draw() {
     });
   }
 
-  //////////// SHAPES TO FIND ////////////////
-  beginShape();
-  noStroke();
-  fill(beige[0]);
-  for (let i = 0; i < v.length; i += 2) {
-    vertex(v[i], v[i + 1]);
-  }
-  endShape(CLOSE);
-
-  //////////// SEQUENCER ////////////////
   push();
   translate(width / 2, height / 2);
+  findShape();
+
   rotate(t.smoothAngle);
-  let sequenceP1 = new Sequence(0, 0, lvl, r, beige[0], rc, 2, north);
+  let sequenceP1 = new Sequence(0, 0, lvl, RADIUS, beige[0], rc, 2, north);
   sequenceP1.show();
   if (polygoneTableP2 != undefined) {
     for (let i = 0; i < polygoneTableP2.length; i++) {
@@ -179,7 +196,7 @@ function draw() {
       new Polygon(
         0,
         0,
-        r,
+        RADIUS,
         pt[i].np,
         pt[i].c,
         lvl.steps,
@@ -254,7 +271,7 @@ function shapeCounter(nShapes) {
 function addShapeToSeq(numOfShapesId, nPoints, col) {
   if (numOfShapesId > 0) {
     polygoneTableP1.push(
-      new Polygon(0, 0, r, nPoints, col, lvl.steps, -globAngle, 1)
+      new Polygon(0, 0, RADIUS, nPoints, col, lvl.steps, -globAngle, 1)
     );
 
     if (player == "p1") {
@@ -352,9 +369,23 @@ function windowResized() {
 let drawActive = false;
 function mousePressed() {
   if (drawActive == true) {
-    v.push(mouseX, mouseY);
-    console.log(v);
+    SHAPE_POINTS.push({ x: mouseX, y: mouseY });
+    console.log(SHAPE_POINTS);
   }
 }
 
 //390
+function findShape() {
+  push();
+  scale(RADIUS * 2);
+  beginShape();
+  noStroke();
+  fill(beige[0]);
+
+  for (let { x, y } /*destructuring ES6*/ of SHAPE_POINTS) {
+    vertex(x, y);
+  }
+
+  endShape(CLOSE);
+  pop();
+}
