@@ -1,27 +1,23 @@
+let sLvl1 = [1, 0, 0, 1, 0, 1, 1, 0];
+let sLvl2 = [0, 1, 0, 1, 1, 1, 1, 0];
+
 let lvl = {
   num: 1,
   steps: 8,
-  rot: 1,
   finished: false,
   p1Finished: false,
   p2Finished: false,
-  shapes: {
-    octo: 1,
-    square: 1,
-    tri: 1,
-    line: 1,
-  },
   shapesP1: {
-    octo: 1,
-    square: 0,
-    tri: 0,
-    line: 1,
+    octo: sLvl1[0],
+    square: sLvl1[1],
+    tri: sLvl1[2],
+    line: sLvl1[3],
   },
   shapesP2: {
-    octo: 0,
-    square: 1,
-    tri: 1,
-    line: 0,
+    octo: sLvl1[4],
+    square: sLvl1[5],
+    tri: sLvl1[6],
+    line: sLvl1[7],
   },
 };
 
@@ -58,13 +54,8 @@ let t = {
   smoothAngle: 0,
 };
 
-function stepRotate(lvlRot, rotSense) {
-  if (rotSense == 1) {
-    t.angle = 360 / lvlRot;
-  } else if (rotSense == -1) {
-    t.angle = (360 / lvlRot) * -1;
-  }
-}
+let v = [717, 364, 543, 435, 542, 607, 717, 783, 889, 783, 964, 611];
+//let v = [];
 
 function preload() {
   myFont = loadFont("./font/Akkurat.woff");
@@ -75,8 +66,8 @@ function setup() {
   textFont(myFont);
   rectMode(CENTER);
   angleMode(DEGREES);
-  arrowEvents();
-  drawPolys();
+  restart();
+  nextLevel();
 
   const urlParameter = new URLSearchParams(window.location.search);
   ID = urlParameter.get("player");
@@ -118,6 +109,18 @@ function setup() {
     north = allData;
   });
 
+  if (player == "p1") {
+    drawPolys("octo", lvl.shapesP1.octo, 8, blue[0]);
+    drawPolys("square", lvl.shapesP1.square, 4, yel[0]);
+    drawPolys("triangle", lvl.shapesP1.tri, 3, orn[0]);
+    drawPolys("line", lvl.shapesP1.line, 2, red[0]);
+  } else if (player == "p2") {
+    drawPolys("octo", lvl.shapesP2.octo, 8, blue[0]);
+    drawPolys("square", lvl.shapesP2.square, 4, yel[0]);
+    drawPolys("triangle", lvl.shapesP2.tri, 3, orn[0]);
+    drawPolys("line", lvl.shapesP2.line, 2, red[0]);
+  }
+
   bassSynth = new Tone.MembraneSynth().toMaster();
   loopBeat = new Tone.Loop(song, "4n");
   Tone.Transport.bpm.value = "125";
@@ -126,7 +129,7 @@ function setup() {
 }
 
 function song(time) {
-  if (lvl.finished == true) {
+  if (lvl.finished == "toChange!") {
     bassSynth.triggerAttackRelease("C2", "8n", time);
   }
 }
@@ -140,14 +143,28 @@ function draw() {
   let sideUiFull = new SideUiFull(player);
   sideUiFull.show();
 
-  //////////// S_HAPES TO FIND ////////////////
+  /////Level
+  let levelUi = document.getElementById("level");
+  let allUi = document.querySelectorAll("p");
+  if (lvl.finished == true) {
+    allUi.forEach(function (n) {
+      n.classList.add("hidden");
+    });
+    levelUi.innerText = "Next level";
+  } else if (lvl.finished == false) {
+    levelUi.innerText = "level " + lvl.num;
+    allUi.forEach(function (n) {
+      n.classList.remove("hidden");
+    });
+  }
+
+  //////////// SHAPES TO FIND ////////////////
   beginShape();
-  vertex(717, 364);
-  vertex(543, 435);
-  vertex(542, 607);
-  vertex(717, 783);
-  vertex(889, 783);
-  vertex(964, 611);
+  noStroke();
+  fill(beige[0]);
+  for (let i = 0; i < v.length; i += 2) {
+    vertex(v[i], v[i + 1]);
+  }
   endShape(CLOSE);
 
   //////////// SEQUENCER ////////////////
@@ -158,15 +175,15 @@ function draw() {
   sequenceP1.show();
   if (polygoneTableP2 != undefined) {
     for (let i = 0; i < polygoneTableP2.length; i++) {
-      let pt2 = polygoneTableP2;
+      let pt = polygoneTableP2;
       new Polygon(
         0,
         0,
         r,
-        pt2[i].np,
-        pt2[i].c,
+        pt[i].np,
+        pt[i].c,
         lvl.steps,
-        pt2[i].rot,
+        pt[i].rot,
         1,
         false
       ).show();
@@ -215,76 +232,15 @@ function draw() {
     SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", true);
     console.log("both player done");
   }
-
-  if (lvl.rot <= 0) {
-    arrowLeft.style = "opacity: 40%; cursor: default !important";
-    arrowRight.style = "opacity: 40%; cursor: default !important";
-  }
   pop();
 }
 
-function arrowEvents() {
-  var arrowLeft = document.getElementById("arrowLeft");
-  var arrowRight = document.getElementById("arrowRight");
-  var uiRot = document.getElementById("uiRot");
-  uiRot.textContent = "Rotations: " + lvl.rot;
-
-  arrowLeft.addEventListener("mouseup", (e) => {
-    if (lvl.rot > 0) {
-      stepRotate(lvl.steps, -1);
-      lvl.rot -= 1;
-      uiRot.textContent = "Rotations: " + lvl.rot;
-      if (seq0 >= lvl.steps - 1) {
-        seq0 = 0;
-      } else {
-        seq0 += 1;
-      }
-    }
-    SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle + t.angle);
-  });
-
-  arrowRight.addEventListener("mouseup", (e) => {
-    if (lvl.rot > 0) {
-      stepRotate(lvl.steps, 1);
-      lvl.rot -= 1;
-      uiRot.textContent = "Rotations: " + lvl.rot;
-      if (seq0 <= 0) {
-        seq0 = lvl.steps - 1;
-      } else {
-        seq0 -= 1;
-      }
-    }
-    SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle + t.angle);
-  });
-}
-
-function drawPolys() {
-  let octoSelect = document.getElementById("octo");
-  octoSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.octo, 8, blue[0]);
-    if (lvl.shapes.octo > 0) {
-      lvl.shapes.octo -= 1;
-    }
-  });
-  let squareSelect = document.getElementById("square");
-  squareSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.square, 4, yel[0]);
-    if (lvl.shapes.square > 0) {
-      lvl.shapes.square -= 1;
-    }
-  });
-  let triangleSelect = document.getElementById("triangle");
-  triangleSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.tri, 3, orn[0]);
-    if (lvl.shapes.tri > 0) {
-      lvl.shapes.tri -= 1;
-    }
-  });
-  let lineSelect = document.getElementById("line");
-  lineSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(lvl.shapes.line, 2, red[0]);
-    if (lvl.shapes.line > 0) {
-      lvl.shapes.line -= 1;
+function drawPolys(id, sNum, nP, col) {
+  let shapeSelect = document.getElementById(id);
+  shapeSelect.addEventListener("mouseup", (e) => {
+    addShapeToSeq(sNum, nP, col);
+    if (sNum > 0) {
+      sNum -= 1;
     }
   });
 }
@@ -306,6 +262,7 @@ function addShapeToSeq(numOfShapesId, nPoints, col) {
     } else if (player == "p2") {
       SEND_MESSAGE(MAINBASE + "/DATA/p2/shapes", polygoneTableP1);
     }
+
     stepRotate(lvl.steps, 1);
     SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle + t.angle);
 
@@ -318,15 +275,86 @@ function addShapeToSeq(numOfShapesId, nPoints, col) {
   }
 }
 
+function stepRotate(lvlRot, rotSense) {
+  if (rotSense == 1) {
+    t.angle = 360 / lvlRot;
+  } else if (rotSense == -1) {
+    t.angle = (360 / lvlRot) * -1;
+  }
+}
+
+function nextLevel() {
+  let levelUi = document.getElementById("level");
+
+  levelUi.addEventListener("mouseup", (e) => {
+    if (lvl.finished == true) {
+      console.log("next level");
+      polygoneTableP1 = [];
+      polygoneTableP2 = [];
+      lvl.shapesP1 = {
+        octo: 1,
+        square: 0,
+        tri: 0,
+        line: 1,
+      };
+      lvl.shapesP2 = {
+        octo: 0,
+        square: 1,
+        tri: 1,
+        line: 0,
+      };
+      globAngle = 0;
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/p1Finished", false);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/p2Finished", false);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", false);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/num", lvl.num + 1);
+      SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
+      SEND_MESSAGE(MAINBASE + "/DATA/p1/", polygoneTableP2);
+      SEND_MESSAGE(MAINBASE + "/DATA/p2/", polygoneTableP2);
+    }
+  });
+}
+
+function restart() {
+  var restartButton = document.getElementById("restart");
+  restartButton.addEventListener("mouseup", (e) => {
+    console.log("restarted");
+    polygoneTableP1 = [];
+    polygoneTableP2 = [];
+    lvl.shapesP1 = {
+      octo: sLvl2[0],
+      square: sLvl2[1],
+      tri: sLvl2[2],
+      line: sLvl2[3],
+    };
+    lvl.shapesP2 = {
+      octo: sLvl2[4],
+      square: sLvl2[5],
+      tri: sLvl2[6],
+      line: sLvl2[7],
+    };
+    globAngle = 0;
+    SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle);
+    SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);
+    SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
+    SEND_MESSAGE(MAINBASE + "/DATA/p1/", polygoneTableP2);
+    SEND_MESSAGE(MAINBASE + "/DATA/p2/", polygoneTableP2);
+  });
+}
+
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
-let pointArray = [];
+////// Get mouse pos on click
+let drawActive = false;
 function mousePressed() {
-  let dividerX = width / mouseX;
-  let dividerY = width / mouseY;
-  pointArray.push("x = " + mouseX + "y = " + mouseY);
-  console.log(pointArray);
+  if (drawActive == true) {
+    v.push(mouseX, mouseY);
+    console.log(v);
+  }
 }
+
 //390
