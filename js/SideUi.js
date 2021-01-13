@@ -26,7 +26,7 @@ class SideUi {
     let sidePoly = new Polygon(
       divX,
       divY,
-      r / 4.5,
+      RADIUS / 4.5,
       this.nPoints,
       this.divCol,
       lvl.steps,
