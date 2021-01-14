@@ -1,5 +1,4 @@
-let sLvl1 = [1, 0, 0, 1, 0, 1, 1, 0];
-let sLvl2 = [0, 1, 0, 1, 1, 1, 1, 0];
+let sLvl = [1, 0, 0, 1, 0, 1, 1, 0];
 
 let lvl = {
   num: 1,
@@ -8,16 +7,16 @@ let lvl = {
   p1Finished: false,
   p2Finished: false,
   shapesP1: {
-    octo: sLvl1[0],
-    square: sLvl1[1],
-    tri: sLvl1[2],
-    line: sLvl1[3],
+    octo: sLvl[0],
+    square: sLvl[1],
+    tri: sLvl[2],
+    line: sLvl[3],
   },
   shapesP2: {
-    octo: sLvl1[4],
-    square: sLvl1[5],
-    tri: sLvl1[6],
-    line: sLvl1[7],
+    octo: sLvl[4],
+    square: sLvl[5],
+    tri: sLvl[6],
+    line: sLvl[7],
   },
 };
 
@@ -57,30 +56,6 @@ let t = {
 let SHAPE_POINTS = readPath(
   "64.7,64.6 56.1,85.4 35.4,85.4 14.7,64.7 14.7,43.9 35.5,35.3 	"
 );
-
-function readPath(pathStr) {
-  let res = pathStr
-    .split(" ")
-    .filter((txt) => txt.length > 1)
-    .map((coords) => {
-      let [x, y] = coords.split(",");
-
-      x = x / 100 - 0.5;
-      y = y / 100 - 0.5;
-
-      return { x, y };
-    });
-  console.log("generated path: ", res);
-  return res;
-}
-
-// let [
-// {x: 717, y: 364},
-// {x: 543, y: 435},
-// {x: 717, y: 364},
-
-// ]
-// //let v = [];
 
 function preload() {
   myFont = loadFont("./font/Akkurat.woff");
@@ -145,18 +120,23 @@ function setup() {
     drawPolys("triangle", lvl.shapesP2.tri, 3, orn[0]);
     drawPolys("line", lvl.shapesP2.line, 2, red[0]);
   }
-
-  bassSynth = new Tone.MembraneSynth().toMaster();
-  loopBeat = new Tone.Loop(song, "4n");
-  Tone.Transport.bpm.value = "125";
-  Tone.Transport.start();
-  loopBeat.start(0);
+  // bassSynth = new Tone.MembraneSynth().toMaster();
+  // loopBeat = new Tone.Loop(song, "4n");
+  // Tone.Transport.bpm.value = "125";
+  // Tone.Transport.start();
+  // loopBeat.start(0);
 }
 
 function song(time) {
-  if (lvl.finished == "toChange!") {
-    bassSynth.triggerAttackRelease("C2", "8n", time);
-  }
+  // if (lvl.finished == true) {
+  //   loopBeat.start(0);
+  //   if (time % 4 == 0) {
+  //     bassSynth.triggerAttackRelease("C4", "8n", time);
+  //   }
+  //   bassSynth.triggerAttackRelease("C2", "8n", time);
+  // } else {
+  //   loopBeat.stop(0);
+  // }
 }
 
 function draw() {
@@ -165,9 +145,8 @@ function draw() {
   t.smoothAngle = lerp(t.smoothAngle, globAngle, 0.1);
   //////////// UI ////////////////
   /////side polys
-  let sideUiFull = new SideUiFull(player);
+  let sideUiFull = new SideUiFull(player, lvl);
   sideUiFull.show();
-
   /////Level
   let levelUi = document.getElementById("level");
   let allUi = document.querySelectorAll("p");
@@ -182,9 +161,9 @@ function draw() {
       n.classList.remove("hidden");
     });
   }
-
   push();
   translate(width / 2, height / 2);
+
   findShape();
 
   rotate(t.smoothAngle);
@@ -209,183 +188,24 @@ function draw() {
   for (let i = 0; i < polygoneTableP1.length; i++) {
     polygoneTableP1[i].show();
   }
-
-  for (let a = 0; a < polygoneTableP1.length; a++) {
-    for (let b = 0; b < polygoneTableP1.length; b++) {
-      if (player == "p1") {
-        if (
-          polygoneTableP1[a].np == 8 &&
-          globAngle - polygoneTableP1[a].rot == 180
-        ) {
-          if (
-            polygoneTableP1[b].np == 2 &&
-            globAngle - polygoneTableP1[b].rot == 135
-          ) {
-            console.log("p1 is done");
-            lvl.p1Finished == true;
-            SEND_MESSAGE(MAINBASE + "/DATA/lvl/p1Finished", true);
-          }
-        }
-      } else if (player == "p2") {
-        if (
-          polygoneTableP1[a].np == 4 &&
-          globAngle - polygoneTableP1[a].rot == 315
-        ) {
-          if (
-            polygoneTableP1[b].np == 3 &&
-            globAngle - polygoneTableP1[b].rot == 180
-          ) {
-            console.log("p2 is done");
-            lvl.p2Finished == true;
-            SEND_MESSAGE(MAINBASE + "/DATA/lvl/p2Finished", true);
-          }
-        }
-      }
-    }
-  }
+  pop();
 
   //Check if level is done
   if (lvl.p1Finished == true && lvl.p2Finished == true) {
     SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", true);
     console.log("both player done");
   }
-  pop();
-}
-
-function drawPolys(id, sNum, nP, col) {
-  let shapeSelect = document.getElementById(id);
-  shapeSelect.addEventListener("mouseup", (e) => {
-    addShapeToSeq(sNum, nP, col);
-    if (sNum > 0) {
-      sNum -= 1;
-    }
-  });
-}
-
-function shapeCounter(nShapes) {
-  if (nShapes > 0) {
-    nShapes -= 1;
-  }
-}
-
-function addShapeToSeq(numOfShapesId, nPoints, col) {
-  if (numOfShapesId > 0) {
-    polygoneTableP1.push(
-      new Polygon(0, 0, RADIUS, nPoints, col, lvl.steps, -globAngle, 1)
-    );
-
-    if (player == "p1") {
-      SEND_MESSAGE(MAINBASE + "/DATA/p1/shapes", polygoneTableP1);
-    } else if (player == "p2") {
-      SEND_MESSAGE(MAINBASE + "/DATA/p2/shapes", polygoneTableP1);
-    }
-
-    stepRotate(lvl.steps, 1);
-    SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle + t.angle);
-
-    if (seq0 <= 0) {
-      seq0 = lvl.steps - 1;
-    } else {
-      seq0 -= 1;
-    }
-    SEND_MESSAGE(MAINBASE + "/DATA/north", seq0);
-  }
-}
-
-function stepRotate(lvlRot, rotSense) {
-  if (rotSense == 1) {
-    t.angle = 360 / lvlRot;
-  } else if (rotSense == -1) {
-    t.angle = (360 / lvlRot) * -1;
-  }
-}
-
-function nextLevel() {
-  let levelUi = document.getElementById("level");
-
-  levelUi.addEventListener("mouseup", (e) => {
-    if (lvl.finished == true) {
-      console.log("next level");
-      polygoneTableP1 = [];
-      polygoneTableP2 = [];
-      lvl.shapesP1 = {
-        octo: 1,
-        square: 0,
-        tri: 0,
-        line: 1,
-      };
-      lvl.shapesP2 = {
-        octo: 0,
-        square: 1,
-        tri: 1,
-        line: 0,
-      };
-      globAngle = 0;
-      SEND_MESSAGE(MAINBASE + "/DATA/lvl/p1Finished", false);
-      SEND_MESSAGE(MAINBASE + "/DATA/lvl/p2Finished", false);
-      SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", false);
-      SEND_MESSAGE(MAINBASE + "/DATA/lvl/num", lvl.num + 1);
-      SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle);
-      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);
-      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
-      SEND_MESSAGE(MAINBASE + "/DATA/p1/", polygoneTableP2);
-      SEND_MESSAGE(MAINBASE + "/DATA/p2/", polygoneTableP2);
-    }
-  });
-}
-
-function restart() {
-  var restartButton = document.getElementById("restart");
-  restartButton.addEventListener("mouseup", (e) => {
-    console.log("restarted");
-    polygoneTableP1 = [];
-    polygoneTableP2 = [];
-    lvl.shapesP1 = {
-      octo: sLvl2[0],
-      square: sLvl2[1],
-      tri: sLvl2[2],
-      line: sLvl2[3],
-    };
-    lvl.shapesP2 = {
-      octo: sLvl2[4],
-      square: sLvl2[5],
-      tri: sLvl2[6],
-      line: sLvl2[7],
-    };
-    globAngle = 0;
-    SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle);
-    SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);
-    SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
-    SEND_MESSAGE(MAINBASE + "/DATA/p1/", polygoneTableP2);
-    SEND_MESSAGE(MAINBASE + "/DATA/p2/", polygoneTableP2);
-  });
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
-
-////// Get mouse pos on click
-let drawActive = false;
-function mousePressed() {
-  if (drawActive == true) {
-    SHAPE_POINTS.push({ x: mouseX, y: mouseY });
-    console.log(SHAPE_POINTS);
-  }
-}
-
-//390
-function findShape() {
-  push();
-  scale(RADIUS * 2);
-  beginShape();
-  noStroke();
-  fill(beige[0]);
-
-  for (let { x, y } /*destructuring ES6*/ of SHAPE_POINTS) {
-    vertex(x, y);
-  }
-
-  endShape(CLOSE);
-  pop();
+  stateMachine();
+  lvl.shapesP1 = {
+    octo: sLvl[0],
+    square: sLvl[1],
+    tri: sLvl[2],
+    line: sLvl[3],
+  };
+  lvl.shapesP2 = {
+    octo: sLvl[4],
+    square: sLvl[5],
+    tri: sLvl[6],
+    line: sLvl[7],
+  };
 }
