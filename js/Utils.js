@@ -65,24 +65,20 @@ function restart() {
 function nextLevel() {
   let levelUi = document.getElementById("level");
 
-  levelUi.addEventListener("mouseup", (e) => {
-    if (
-      lvl.finished == true ||
-      lvl.P1finished == true ||
-      lvl.P2finished == true
-    ) {
+  levelUi.addEventListener("click", (e) => {
+    if (lvl.finished == true) {
       if (player == "p1") {
         SEND_MESSAGE(MAINBASE + "/DATA/lvl/num", lvl.num + 1);
       }
       SEND_MESSAGE(MAINBASE + "/DATA/lvl/p1Finished", false);
       SEND_MESSAGE(MAINBASE + "/DATA/lvl/p2Finished", false);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", false);
       console.log("next level");
       polygoneTableP1 = [];
       polygoneTableP2 = [];
       globAngle = 0;
       north = 0;
       SEND_MESSAGE(MAINBASE + "/DATA/north/", north);
-      SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", false);
       SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle);
       SEND_MESSAGE(MAINBASE + "/DATA/p1/", polygoneTableP2);
       SEND_MESSAGE(MAINBASE + "/DATA/p2/", polygoneTableP2);
@@ -101,6 +97,7 @@ function nextLevel() {
       };
       updatePolys(lvl);
     }
+    SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", false);
   });
 }
 

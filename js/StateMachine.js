@@ -1,5 +1,11 @@
 function stateMachine() {
   switch (lvl.num) {
+    case 0:
+      SHAPE_POINTS = readPath("0,0");
+      sLvl = [0, 0, 0, 0, 0, 0, 0, 0];
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
+      break;
     case 1:
       SHAPE_POINTS = readPath(
         "64.7,64.6 56.1,85.4 35.4,85.4 14.7,64.7 14.7,43.9 35.5,35.3 	"

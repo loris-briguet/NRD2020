@@ -1,11 +1,11 @@
 let sLvl = [1, 0, 0, 1, 0, 1, 1, 0];
 
 let lvl = {
-  num: 1,
+  num: 0,
   steps: 8,
-  finished: false,
-  p1Finished: false,
-  p2Finished: false,
+  finished: true,
+  p1Finished: true,
+  p2Finished: true,
   shapesP1: {
     octo: sLvl[0],
     square: sLvl[1],
@@ -126,7 +126,7 @@ function setup() {
 
 function song(time) {
   let seqMel = ["F2", "C2", "B2", "B1", "E1", "C2", "F3", "B1"];
-  if (lvl.finished == true) {
+  if (lvl.finished == true && lvl.num > 0) {
     bassSynth3.triggerAttackRelease("C1", "4m", time, 0.7);
     if (masterClock % 2 == 0) {
       bassSynth4.triggerAttackRelease(seqMel[masterClock], "1m", time, 0.4);
@@ -148,71 +148,69 @@ function song(time) {
 }
 
 function draw() {
+  console.log(lvl);
   background("#111111");
   RADIUS = width / 4;
   t.smoothAngle = lerp(t.smoothAngle, globAngle, 0.1);
   //////////// UI ////////////////
   /////side polys
-  let sideUiFull = new SideUiFull(player, lvl);
-  sideUiFull.show();
   /////Level
   let levelUi = document.getElementById("level");
   let allUi = document.querySelectorAll("p");
-  if (lvl.finished == true) {
+  if (lvl.num != 0) {
+    if (lvl.finished == true) {
+      allUi.forEach(function (n) {
+        n.classList.add("hidden");
+      });
+      levelUi.innerText = "Next level";
+    } else if (lvl.finished == false) {
+      levelUi.innerText = "level " + lvl.num;
+      allUi.forEach(function (n) {
+        n.classList.remove("hidden");
+      });
+      let sideUiFull = new SideUiFull(player, lvl);
+      sideUiFull.show();
+    }
+
+    push();
+    translate(width / 2, height / 2);
+
+    findShape();
+
+    rotate(t.smoothAngle);
+    let sequenceP1 = new Sequence(0, 0, lvl, RADIUS, beige[0], rc, 2, north);
+    sequenceP1.show(masterClock);
+    if (polygoneTableP2 != undefined) {
+      for (let i = 0; i < polygoneTableP2.length; i++) {
+        let pt = polygoneTableP2;
+        new Polygon(
+          0,
+          0,
+          RADIUS,
+          pt[i].np,
+          pt[i].c,
+          lvl.steps,
+          pt[i].rot,
+          1,
+          false
+        ).show();
+      }
+    }
+    for (let i = 0; i < polygoneTableP1.length; i++) {
+      polygoneTableP1[i].show();
+    }
+    pop();
+  } else {
     allUi.forEach(function (n) {
+      levelUi.innerText = "Start";
       n.classList.add("hidden");
     });
-    levelUi.innerText = "Next level";
-  } else if (lvl.finished == false) {
-    levelUi.innerText = "level " + lvl.num;
-    allUi.forEach(function (n) {
-      n.classList.remove("hidden");
-    });
-  }
-  push();
-  translate(width / 2, height / 2);
-
-  findShape();
-
-  rotate(t.smoothAngle);
-  let sequenceP1 = new Sequence(0, 0, lvl, RADIUS, beige[0], rc, 2, north);
-  sequenceP1.show(masterClock);
-  if (polygoneTableP2 != undefined) {
-    for (let i = 0; i < polygoneTableP2.length; i++) {
-      let pt = polygoneTableP2;
-      new Polygon(
-        0,
-        0,
-        RADIUS,
-        pt[i].np,
-        pt[i].c,
-        lvl.steps,
-        pt[i].rot,
-        1,
-        false
-      ).show();
-    }
-  }
-  for (let i = 0; i < polygoneTableP1.length; i++) {
-    polygoneTableP1[i].show();
-  }
-  pop();
-
-  //Check if level is done
-  if (lvl.p1Finished == true && lvl.p2Finished == true) {
-    SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", true);
   }
   stateMachine();
-  lvl.shapesP1 = {
-    octo: sLvl[0],
-    square: sLvl[1],
-    tri: sLvl[2],
-    line: sLvl[3],
-  };
-  lvl.shapesP2 = {
-    octo: sLvl[4],
-    square: sLvl[5],
-    tri: sLvl[6],
-    line: sLvl[7],
-  };
+  //Check if level is done
+  if (lvl.num > 0) {
+    if (lvl.p1Finished == true && lvl.p2Finished == true) {
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", true);
+    }
+  }
 }
