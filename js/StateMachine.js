@@ -10,18 +10,14 @@ function stateMachine() {
       SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
       break;
     case 2:
-      SHAPE_POINTS = readPath(
-        "70.7,50 60.4,75 35.4,64.6 20.7,29.3 35.4,14.6 56.1,14.6 	"
-      );
-      checkLevelState(8, 180, 2, 135, 4, 315, 3, 180);
+      SHAPE_POINTS = readPath("64.7,35.3 25,75 14.6,64.6 14.6,35.3 29.2,20.7 	");
+      checkLevelState(4, 270, 2, 225, 8, 180, 3, 135);
       sLvl = [0, 1, 0, 1, 1, 0, 1, 0];
       SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);
       SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
       break;
     case 3:
-      SHAPE_POINTS = readPath(
-        "70.7,50 60.4,75 35.4,64.6 20.7,29.3 35.4,14.6 56.1,14.6 	"
-      );
+      SHAPE_POINTS = readPath("50,100 100,50 85.4,85.4 	");
       checkLevelState(8, 180, 2, 135, 4, 315, 3, 180);
       sLvl = [0, 0, 1, 1, 1, 1, 0, 0];
       SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);

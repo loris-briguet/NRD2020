@@ -4,15 +4,31 @@
 	 height="100px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:none;stroke:#FF1D1B;stroke-width:2;stroke-miterlimit:10;}
-	.st1{fill:none;stroke:#1D1DFF;stroke-miterlimit:10;}
+	.st1{display:none;}
+	.st2{display:inline;fill:none;stroke:#1D1DFF;stroke-miterlimit:10;}
+	.st3{fill:none;stroke:#1D1DFF;stroke-miterlimit:10;}
 </style>
+<g id="Layer_4">
+	
+		<image style="display:none;overflow:visible;" width="618" height="616" xlink:href="../../../../../../Desktop/Screenshot 2021-01-14 at 18.20.56.png"  transform="matrix(0.1618 0 0 0.1623 0 0)">
+	</image>
+	
+		<image style="overflow:visible;" width="854" height="864" xlink:href="../../../../../../Desktop/Screenshot 2021-01-14 at 19.09.06.png"  transform="matrix(0.1171 0 0 0.1157 0 0)">
+	</image>
+</g>
 <g id="octogon_template">
-	<polyline class="st0" points="50,0 14.6,14.6 0,50 14.6,85.4 50,100 85.4,85.4 100,50 85.4,14.6 50,0 	"/>
+	<polyline class="st0" points="50,0 85.4,14.6 100,50 85.4,85.4 50,100 14.6,85.4 0,50 14.6,14.6 50,0 	"/>
 </g>
-<g id="shape">
-	<polygon class="st1" points="64.7,64.6 56.1,85.4 35.4,85.4 14.7,64.7 14.7,43.9 35.5,35.3 	"/>
+<g id="shape" class="st1">
+	<polygon class="st2" points="64.7,64.6 56.1,85.4 35.4,85.4 14.7,64.7 14.7,43.9 35.5,35.3 	"/>
 </g>
-<g id="shape2">
-	<polygon class="st1" points="70.7,50 60.4,75 35.4,64.6 20.7,29.3 35.4,14.6 56.1,14.6 	"/>
+<g id="shape2" class="st1">
+	<polygon class="st2" points="64.7,35.3 25,75 14.6,64.6 14.6,35.3 29.2,20.7 	"/>
+	<polygon class="st2" points="64.7,35.3 25,75 14.6,64.6 14.6,35.3 29.2,20.7 	"/>
+	<line class="st2" x1="64.7" y1="35.3" x2="25" y2="75"/>
+</g>
+<g id="shape3">
+	<polygon class="st3" points="50,100 100,50 85.4,85.4 	"/>
+	<polygon class="st3" points="0,50 20.7,29.3 29.3,50 	"/>
 </g>
 </svg>

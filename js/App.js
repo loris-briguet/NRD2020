@@ -36,7 +36,6 @@ let orn = ["rgba(235,100,1,1)", "rgba(235,100,0,0.4)"];
 let yel = ["rgba(235,180,0,1)", "rgba(235,180,0,0.4)"];
 
 let myFont;
-let seq0 = 0;
 let north;
 var RADIUS;
 let rc = 12.5;
@@ -109,34 +108,43 @@ function setup() {
     north = allData;
   });
 
-  if (player == "p1") {
-    drawPolys("octo", lvl.shapesP1.octo, 8, blue[0]);
-    drawPolys("square", lvl.shapesP1.square, 4, yel[0]);
-    drawPolys("triangle", lvl.shapesP1.tri, 3, orn[0]);
-    drawPolys("line", lvl.shapesP1.line, 2, red[0]);
-  } else if (player == "p2") {
-    drawPolys("octo", lvl.shapesP2.octo, 8, blue[0]);
-    drawPolys("square", lvl.shapesP2.square, 4, yel[0]);
-    drawPolys("triangle", lvl.shapesP2.tri, 3, orn[0]);
-    drawPolys("line", lvl.shapesP2.line, 2, red[0]);
-  }
-  // bassSynth = new Tone.MembraneSynth().toMaster();
-  // loopBeat = new Tone.Loop(song, "4n");
-  // Tone.Transport.bpm.value = "125";
-  // Tone.Transport.start();
-  // loopBeat.start(0);
+  updatePolys(lvl);
+
+  const reverb = new Tone.Freeverb().toDestination();
+  const autoWah = new Tone.AutoWah(50, 6, -30).connect(reverb);
+  const FeedbackDelay = new Tone.FeedbackDelay("8n", 0.5).connect(autoWah);
+  bassSynth1 = new Tone.MetalSynth().toMaster();
+  bassSynth2 = new Tone.FMSynth().connect(reverb);
+  bassSynth3 = new Tone.MembraneSynth().toMaster();
+  bassSynth4 = new Tone.MonoSynth().connect(FeedbackDelay);
+  loopBeat = new Tone.Loop(song, "1m");
+  Tone.Transport.bpm.value = "500";
+  Tone.Transport.start();
+  loopBeat.start(0);
+  masterClock = 0;
 }
 
 function song(time) {
-  // if (lvl.finished == true) {
-  //   loopBeat.start(0);
-  //   if (time % 4 == 0) {
-  //     bassSynth.triggerAttackRelease("C4", "8n", time);
-  //   }
-  //   bassSynth.triggerAttackRelease("C2", "8n", time);
-  // } else {
-  //   loopBeat.stop(0);
-  // }
+  let seqMel = ["F2", "C2", "B2", "B1", "E1", "C2", "F3", "B1"];
+  if (lvl.finished == true) {
+    bassSynth3.triggerAttackRelease("C1", "4m", time, 0.7);
+    if (masterClock % 2 == 0) {
+      bassSynth4.triggerAttackRelease(seqMel[masterClock], "1m", time, 0.4);
+    }
+
+    if (masterClock == 1 || masterClock == 4 || masterClock == 7) {
+      bassSynth1.triggerAttackRelease("F#1", "1m", time, 0.2);
+    }
+
+    if (masterClock == 2) {
+      bassSynth2.triggerAttackRelease("E5", "1m", time, 0.5);
+    }
+    if (masterClock == 6) {
+      bassSynth2.triggerAttackRelease("F5", "1m", time, 0.5);
+    }
+
+    masterClock = (masterClock + 1) % 8;
+  }
 }
 
 function draw() {
@@ -168,7 +176,7 @@ function draw() {
 
   rotate(t.smoothAngle);
   let sequenceP1 = new Sequence(0, 0, lvl, RADIUS, beige[0], rc, 2, north);
-  sequenceP1.show();
+  sequenceP1.show(masterClock);
   if (polygoneTableP2 != undefined) {
     for (let i = 0; i < polygoneTableP2.length; i++) {
       let pt = polygoneTableP2;
@@ -193,7 +201,6 @@ function draw() {
   //Check if level is done
   if (lvl.p1Finished == true && lvl.p2Finished == true) {
     SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", true);
-    console.log("both player done");
   }
   stateMachine();
   lvl.shapesP1 = {

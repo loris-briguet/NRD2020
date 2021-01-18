@@ -1,15 +1,30 @@
+function updatePolys(lvl) {
+  if (player == "p1") {
+    drawPolys("octo", lvl.shapesP1.octo, 8, blue[0]);
+    drawPolys("square", lvl.shapesP1.square, 4, yel[0]);
+    drawPolys("triangle", lvl.shapesP1.tri, 3, orn[0]);
+    drawPolys("line", lvl.shapesP1.line, 2, red[0]);
+  } else if (player == "p2") {
+    drawPolys("octo", lvl.shapesP2.octo, 8, blue[0]);
+    drawPolys("square", lvl.shapesP2.square, 4, yel[0]);
+    drawPolys("triangle", lvl.shapesP2.tri, 3, orn[0]);
+    drawPolys("line", lvl.shapesP2.line, 2, red[0]);
+  }
+}
+
 function drawPolys(id, sNum, nP, col) {
   let shapeSelect = document.getElementById(id);
   shapeSelect.addEventListener("mouseup", (e) => {
     addShapeToSeq(sNum, nP, col);
-    shapeCounter(sNum);
+    if (sNum > 0) {
+      sNum -= 1;
+    }
+    if (player == "p1") {
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1/" + id, sNum);
+    } else if (player == "p2") {
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2/" + id, sNum);
+    }
   });
-}
-
-function shapeCounter(nShapes) {
-  if (nShapes > 0) {
-    nShapes -= 1;
-  }
 }
 
 function addShapeToSeq(numOfShapesId, nPoints, col) {
@@ -27,12 +42,12 @@ function addShapeToSeq(numOfShapesId, nPoints, col) {
     stepRotate(lvl.steps, 1);
     SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle + t.angle);
 
-    if (seq0 <= 0) {
-      seq0 = lvl.steps - 1;
+    if (north <= 0) {
+      north = lvl.steps - 1;
     } else {
-      seq0 -= 1;
+      north -= 1;
     }
-    SEND_MESSAGE(MAINBASE + "/DATA/north", seq0);
+    SEND_MESSAGE(MAINBASE + "/DATA/north", north);
   }
 }
 

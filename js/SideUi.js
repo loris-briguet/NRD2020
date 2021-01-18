@@ -34,7 +34,6 @@ class SideUi {
       1
     );
 
-    // console.log(this.nShapes + "in side Ui")
     sidePoly.show();
     divT.textContent = this.nShapes + "x";
     divT.style.color = this.divCol;
