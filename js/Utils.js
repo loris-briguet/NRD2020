@@ -1,3 +1,6 @@
+let drawn = false;
+let drawnNext = false;
+
 function checkLevelState(np1, a1, np2, a2, np3, a3, np4, a4) {
   for (let a = 0; a < polygoneTableP1.length; a++) {
     for (let b = 0; b < polygoneTableP1.length; b++) {
@@ -35,6 +38,8 @@ function checkLevelState(np1, a1, np2, a2, np3, a3, np4, a4) {
 function restart() {
   var restartButton = document.getElementById("restart");
   restartButton.addEventListener("mouseup", (e) => {
+    console.log("restart called");
+    drawn = false;
     console.log("restarted");
     polygoneTableP1 = [];
     polygoneTableP2 = [];
@@ -51,14 +56,17 @@ function restart() {
       line: sLvl[7],
     };
     globAngle = 0;
-    updatePolys(lvl);
     north = 0;
-    SEND_MESSAGE(MAINBASE + "/DATA/north/", north);
-    SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle);
-    SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);
-    SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
-    SEND_MESSAGE(MAINBASE + "/DATA/p1/", polygoneTableP2);
-    SEND_MESSAGE(MAINBASE + "/DATA/p2/", polygoneTableP2);
+    if (!drawn) {
+      updatePolys(lvl);
+      SEND_MESSAGE(MAINBASE + "/DATA/north/", north);
+      SEND_MESSAGE(MAINBASE + "/DATA/angle", globAngle);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP2", lvl.shapesP2);
+      SEND_MESSAGE(MAINBASE + "/DATA/lvl/shapesP1", lvl.shapesP1);
+      SEND_MESSAGE(MAINBASE + "/DATA/p1/", polygoneTableP2);
+      SEND_MESSAGE(MAINBASE + "/DATA/p2/", polygoneTableP2);
+      drawn = true;
+    }
   });
 }
 
@@ -66,8 +74,8 @@ function nextLevel() {
   let levelUi = document.getElementById("level");
 
   levelUi.addEventListener("click", (e) => {
-    if (lvl.finished == true) {
-      if (player == "p1") {
+    if (lvl.finished === true) {
+      if (player === "p1") {
         SEND_MESSAGE(MAINBASE + "/DATA/lvl/num", lvl.num + 1);
       }
       SEND_MESSAGE(MAINBASE + "/DATA/lvl/p1Finished", false);
@@ -95,7 +103,6 @@ function nextLevel() {
         tri: sLvl[6],
         line: sLvl[7],
       };
-      updatePolys(lvl);
     }
     SEND_MESSAGE(MAINBASE + "/DATA/lvl/finished", false);
   });

@@ -65,8 +65,8 @@ function setup() {
   textFont(myFont);
   rectMode(CENTER);
   angleMode(DEGREES);
-  restart();
   nextLevel();
+  restart();
 
   const urlParameter = new URLSearchParams(window.location.search);
   ID = urlParameter.get("player");
@@ -148,7 +148,6 @@ function song(time) {
 }
 
 function draw() {
-  console.log(lvl);
   background("#111111");
   RADIUS = width / 4;
   t.smoothAngle = lerp(t.smoothAngle, globAngle, 0.1);
@@ -157,7 +156,7 @@ function draw() {
   /////Level
   let levelUi = document.getElementById("level");
   let allUi = document.querySelectorAll("p");
-  if (lvl.num != 0) {
+  if (lvl.num > 0 && lvl.num <= 2) {
     if (lvl.finished == true) {
       allUi.forEach(function (n) {
         n.classList.add("hidden");
@@ -200,9 +199,14 @@ function draw() {
       polygoneTableP1[i].show();
     }
     pop();
-  } else {
+  } else if (lvl.num == 0) {
     allUi.forEach(function (n) {
       levelUi.innerText = "Start";
+      n.classList.add("hidden");
+    });
+  } else if (lvl.num == 3) {
+    allUi.forEach(function (n) {
+      levelUi.innerText = "You finnished the game";
       n.classList.add("hidden");
     });
   }

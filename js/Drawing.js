@@ -4,17 +4,20 @@ function updatePolys(lvl) {
     drawPolys("square", lvl.shapesP1.square, 4, yel[0]);
     drawPolys("triangle", lvl.shapesP1.tri, 3, orn[0]);
     drawPolys("line", lvl.shapesP1.line, 2, red[0]);
+    console.log("called update p1");
   } else if (player == "p2") {
     drawPolys("octo", lvl.shapesP2.octo, 8, blue[0]);
     drawPolys("square", lvl.shapesP2.square, 4, yel[0]);
     drawPolys("triangle", lvl.shapesP2.tri, 3, orn[0]);
     drawPolys("line", lvl.shapesP2.line, 2, red[0]);
+    console.log("called update p2");
   }
 }
 
 function drawPolys(id, sNum, nP, col) {
   let shapeSelect = document.getElementById(id);
   shapeSelect.addEventListener("mouseup", (e) => {
+    console.log("called draw");
     addShapeToSeq(sNum, nP, col);
     if (sNum > 0) {
       sNum -= 1;
@@ -29,6 +32,7 @@ function drawPolys(id, sNum, nP, col) {
 
 function addShapeToSeq(numOfShapesId, nPoints, col) {
   if (numOfShapesId > 0) {
+    console.log("called add");
     polygoneTableP1.push(
       new Polygon(0, 0, RADIUS, nPoints, col, lvl.steps, -globAngle, 1)
     );
